@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drozd Bread — хлеб и каши</title>
+<style>
+  :root{
+    --bg:#f6f1ea; --card:#fffdf9; --ink:#2b2420; --muted:#7d6f64; --line:#e8ddd0;
+    --accent:#8a4b2a; --accent-soft:#f1e3d6; --rye:#5b3a29; --ok:#3f6b3a; --warn:#a35a1c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#1d1916; --card:#27211d; --ink:#f0e7dd; --muted:#a8998b; --line:#3a312a;
+      --accent:#e0a37a; --accent-soft:#3a2b21; --rye:#d9b39a; --ok:#9cc795; --warn:#e8a46a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:20px 16px 80px}
+  h1{font:600 28px/1.2 Georgia,serif;margin:4px 0 4px}
+  .sub{color:var(--muted);margin:0 0 16px}
+  .bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);
+       display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .grp{display:flex;align-items:center;gap:6px}
+  .grp span{color:var(--muted);font-size:13px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+  .seg button{border:0;background:none;color:var(--ink);padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff}
+  .mseg{display:flex;margin-top:6px;border:1px solid var(--line);border-radius:999px;overflow:hidden;width:max-content;font-weight:400}
+  .mseg button{border:0;background:var(--card);color:var(--ink);padding:3px 9px;font:inherit;font-size:12px;cursor:pointer}
+  .mseg button.on{background:var(--accent);color:#fff}
+  nav{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
+  nav a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);
+        border-radius:999px;padding:4px 10px}
+  h2{font:600 20px/1.3 Georgia,serif;margin:28px 0 10px;color:var(--muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin:12px 0;scroll-margin-top:70px}
+  .card h3{font:600 21px/1.25 Georgia,serif;margin:0 0 6px}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+  .tag{font-size:12px;border-radius:999px;padding:2px 9px;background:var(--accent-soft);color:var(--accent)}
+  .tag.now{color:var(--ok)} .tag.need{color:var(--warn)}
+  .why{color:var(--muted);margin:0 0 12px}
+  .cols{display:grid;grid-template-columns:minmax(220px,1fr) 1.4fr;gap:20px}
+  @media (max-width:680px){.cols{grid-template-columns:1fr}}
+  table.ing{width:100%;border-collapse:collapse}
+  table.ing td{padding:5px 0;border-bottom:1px dashed var(--line);vertical-align:top}
+  table.ing td.q{text-align:right;white-space:nowrap;font-weight:600;padding-left:10px}
+  table.ing tr.h td{border:0;padding-top:10px;font-size:13px;color:var(--accent);font-weight:600}
+  .hint{display:block;font-size:12px;color:var(--muted);font-weight:400}
+  ol{margin:0;padding-left:20px} ol li{margin:0 0 6px}
+  .bake{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+  .bake div{background:var(--accent-soft);border-radius:12px;padding:8px 10px;font-size:14px}
+  .bake b{display:block;font-size:12px;color:var(--muted);font-weight:500}
+  .note{font-size:14px;color:var(--muted);margin-top:10px}
+  .ref p,.ref li{font-size:15px}
+  .ref table{border-collapse:collapse;width:100%;font-size:14px;margin:6px 0 10px}
+  .ref th,.ref td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+  .ref h4{margin:16px 0 4px;font-size:16px}
+  .wrap{max-width:1100px}
+  .tabs{display:flex;gap:6px;margin:6px 0 10px}
+  .tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:8px 18px;font:inherit;cursor:pointer}
+  .tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .page{display:none}.page.on{display:block}
+  table.kasha td.ok{background:#d6ead0;color:#24401f}
+  .slider{display:flex;align-items:center;gap:8px}
+  .vol{display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .vol input{width:90px;accent-color:var(--accent)}
+  .vol output{font-weight:600;min-width:38px}
+  .tw{position:relative;margin-top:14px}
+  table.rec{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  table.rec th{font-size:12px;color:var(--muted);font-weight:500;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  table.rec td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+  table.rec tr.g td{background:var(--bg);color:var(--accent);font-weight:600;font-size:13px}
+  table.rec tr.r:hover td{background:var(--accent-soft)}
+  .rname{font-weight:600}
+  table.rec td:nth-child(3),table.rec td:nth-child(5){white-space:nowrap}
+  .meter{height:6px;border-radius:3px;background:var(--line);width:70px;margin-top:4px;overflow:hidden}
+  .meter i{display:block;height:100%;background:var(--rye)}
+  #pop{position:absolute;left:0;right:0;z-index:10;display:none;margin:4px 0 0;box-shadow:0 14px 40px rgba(0,0,0,.2)}
+  #pop.on{display:block}
+  .vs{display:grid;grid-template-columns:150px 1fr 1fr;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:12px}
+  .vs>div{padding:10px 14px;border-bottom:1px solid var(--line);font-size:14px}
+  .vs .hd{font:600 19px Georgia,serif;display:flex;align-items:center;gap:8px;background:var(--accent-soft)}
+  .vs .k{color:var(--muted);font-size:13px}
+  .ico{font-size:24px}
+  .bar2{height:10px;border-radius:5px;background:var(--line);overflow:hidden;margin:4px 0}
+  .bar2 i{display:block;height:100%}
+  .wheat i{background:#d8a24a}.rye i{background:var(--rye)}
+  .flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .step .n{font-size:30px;line-height:1}
+  .step b{display:block;margin:6px 0 2px}
+  .step p{margin:0;font-size:13px;color:var(--muted)}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+  .tile .big{font:600 24px Georgia,serif}
+  .tile p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+  .tile.good{border-color:var(--ok)}.tile.bad{border-color:var(--warn)}
+  .was{text-decoration:line-through;color:var(--muted);font-size:16px;margin-right:6px}
+  .hand .yrow{grid-template-columns:110px 140px 1fr}
+  .yrow{display:grid;grid-template-columns:150px 1fr 110px;gap:12px;align-items:center;margin:10px 0;font-size:14px}
+  @media (max-width:680px){.vs{grid-template-columns:100px 1fr 1fr}.yrow{grid-template-columns:100px 1fr 80px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Хлеб и каши</h1>
+
+  <div class="tabs"><button data-p="rec" class="on">🍞 Рецепты</button><button data-p="pr">💡 Принципы</button><button data-p="kasha">🥣 Каши</button></div>
+
+  <div class="page on" id="p-rec">
+    <p class="sub">Обычные сухие дрожжи, без кефира и закваски. Около 400 г муки на буханку — столько помещается в чашу и пропекается.</p>
+    <div class="bar">
+      <div class="grp"><span>Основное</span>
+        <div class="seg" data-k="main"><button data-v="g">граммы</button><button data-v="ml">миллилитры</button></div></div>
+      <div class="grp"><span>Мелочи</span>
+        <div class="seg" data-k="small"><button data-v="sp">ложки</button><button data-v="g">граммы</button><button data-v="ml">мл</button></div></div>
+    </div>
+    <div class="tw">
+      <table class="rec">
+        <thead><tr><th>Рецепт</th><th>Объём</th><th>Рожь</th><th>Время</th><th>Вода от муки</th><th>Аэрогриль</th><th>Чем хорош</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div id="pop" class="card"></div>
+    </div>
+    <p class="note">Наведи на строку — покажется полный рецепт: состав в выбранных единицах, шаги, выпечка.</p>
+  </div>
+
+  <div class="page" id="p-kasha">
+    <div class="tw"><table class="rec kasha"><thead><tr><th>Крупа</th><th>То что попробовать</th><th>Прошлая попытка</th><th>Позапрошлая попытка</th></tr></thead>
+      <tbody><tr><td class="rname">Рис</td><td class="ok">Теплая 2.5 на 1 каши, 45 мин</td><td>Холодная 2.5 на 1 каши, 45 мин, не хватило воды + времени чутка</td><td></td></tr><tr><td class="rname">Булгур</td><td class="ok">Теплая 2.2 на 1 каши, 45 мин</td><td></td><td></td></tr><tr><td class="rname">Кускус мал.</td><td>Теплая 2.5 на 1 каши, 20мин</td><td>Теплая 2.5 на 1 каши, 25мин</td><td></td></tr><tr><td class="rname">Кускус бол.</td><td class="ok">Теплая 2 к 1 каши, 45 мин</td><td>Теплая 2.5 на 1 каши, 45 мин</td><td></td></tr><tr><td class="rname">Перловка</td><td>Теплая 2.2 на 1 каши, 45 мин  ПРОМЫТЬ!!!</td><td>Теплая 2.5 на 1 каши, 45 мин</td><td></td></tr><tr><td class="rname">Гречка</td><td class="ok">Теплая 2.3 на 1 каши, 40 мин</td><td></td><td></td></tr><tr><td class="rname">Чечевица зеленая</td><td>Теплая 2 на 1 каши, 100 мин</td><td>Теплая 2 на 1 каши, 55 + 10, и немного еще бы поватить стоило</td><td>Теплая 2.5 на 1 каши, 80 мин, хорошо получилось, но долго и много воды</td></tr></tbody></table></div>
+  </div>
+
+  <div class="page" id="p-pr">
+    <h2>🌾 Пшеничный и 🟫 ржаной — в чём разница</h2>
+    <div class="vs">
+      <div></div><div class="hd"><span class="ico">🌾</span>Пшеничный</div><div class="hd"><span class="ico">🟫</span>Ржаной (50%+)</div>
+      <div class="k">💧 Вода от муки</div>
+        <div><div class="bar2 wheat"><i style="width:62%"></i></div>60–65%</div>
+        <div><div class="bar2 rye"><i style="width:82%"></i></div>80–85%</div>
+      <div class="k">🤲 Замес</div>
+        <div>Месить руками 8–10 мин: клейковина тянется и держит газ</div>
+        <div>Мешать ложкой 3–5 мин: клейковины почти нет, тесто как замазка</div>
+      <div class="k">🍋 Кислота</div>
+        <div>Не нужна</div>
+        <div>Нужна — ночная опара или 1 ст. л. уксуса, иначе мякиш липкий</div>
+      <div class="k">👊 Обминка</div>
+        <div>Прижать, сложить 3–4 раза, скатать шар</div>
+        <div>Перемешать ложкой, мокрыми руками в чашу</div>
+      <div class="k">🧺 Расстойка готова</div>
+        <div>Выросло в 1,5 раза</div>
+        <div>Пошли трещинки по верху</div>
+      <div class="k">🔥 Аэрогриль</div>
+        <div><b>160 °C</b> · 25–30 мин, без переворота</div>
+        <div><b>150–160 °C</b> · 40–50 мин + 10 дном вверх</div>
+      <div class="k">🌡 Готов в центре</div>
+        <div>93–96 °C</div>
+        <div>96–98 °C</div>
+      <div class="k">🔪 Резать через</div>
+        <div>1 ч</div>
+        <div>6–8 ч в полотенце — мякиш доходит после печи</div>
+    </div>
+
+    <h2>🔁 Путь теста — и зачем каждый шаг</h2>
+    <div class="flow">
+      <div class="step"><div class="n">🥣</div><b>Замес</b><p>Мука + вода + дрожжи + соль. Соль — в муку, не в воду к дрожжам.</p></div>
+      <div class="step"><div class="n">⏸</div><b>Отдых 10–15 мин</b><p>Мука пьёт воду, тесто перестаёт липнуть само. Муки досыпать почти не придётся.</p></div>
+      <div class="step"><div class="n">💪</div><b>Вымесить</b><p>Тесто прилипает и отлипает от руки. Изюм и семена — сейчас.</p></div>
+      <div class="step"><div class="n">🫧</div><b>Подъём ×2</b><p>Дрожжи надувают тесто. Готово, когда ямка от пальца выправляется медленно.</p></div>
+      <div class="step"><div class="n">👊</div><b>Обминка</b><p>Выпускает крупные пузыри, подтягивает клейковину, подкладывает дрожжам свежую муку. Не месить заново — клейковина запружинит.</p></div>
+      <div class="step"><div class="n">🧺</div><b>Расстойка ×1,5</b><p>Шар в чаше на пергаменте, 30–45 мин. Без неё хлеб плотный.</p></div>
+      <div class="step"><div class="n">🔥</div><b>Выпечка</b><p>160 °C, 25–30 мин. Переворачивать и накрывать фольгой не нужно — аэрогриль пропекает сам.</p></div>
+      <div class="step"><div class="n">⏳</div><b>Остывание</b><p>Мякиш досыхает паром. Резать горячим — липко.</p></div>
+    </div>
+
+    <h2>🖐 Вода на ощупь — без градусника</h2>
+    <div class="tile hand">
+      <div class="yrow"><b>🧊 до 15 °C</b><div class="bar2"><i style="width:15%;background:#7fa7c9"></i></div><span>холодная, пальцы ломит — дрожжи спят</span></div>
+      <div class="yrow"><b>20–25 °C</b><div class="bar2"><i style="width:30%;background:#9bbf9b"></i></div><span>комнатная: ни тепла, ни холода — для ночных рецептов</span></div>
+      <div class="yrow"><b>✅ 35–38 °C</b><div class="bar2"><i style="width:48%;background:var(--ok)"></i></div><span><b>тёпленькая:</b> тепло заметно, но слабо, палец держишь сколько угодно — для дрожжей</span></div>
+      <div class="yrow"><b>40–45 °C</b><div class="bar2"><i style="width:60%;background:#d8a24a"></i></div><span>добро-тёплая, как горячая ванна — дрожжи живы, но это верх</span></div>
+      <div class="yrow"><b>⚠ 50–55 °C</b><div class="bar2"><i style="width:75%;background:var(--warn)"></i></div><span>горячая: через 5–10 с хочется вынуть руку — часть дрожжей гибнет</span></div>
+      <div class="yrow"><b>❌ 60 °C+</b><div class="bar2"><i style="width:90%;background:#b33"></i></div><span>обжигающая, палец сразу отдёргиваешь — дрожжи гибнут</span></div>
+      <p>Пробуй пальцем или запястьем: руки обычно прохладнее тела, и тёплое кажется теплее, чем есть. Сомневаешься — бери прохладнее: холодная вода только замедлит, горячая убьёт.</p>
+      <p><b>Без градусника:</b> 1 часть кипятка + 2,5 части холодной из-под крана ≈ 35–38 °C. На 250 мл — 70 мл кипятка и 180 мл холодной.</p>
+      <p><b>Проверка дрожжей:</b> через 10 минут в воде с сахаром шапка пены — живые. Пены нет — мёртвые или вода была горячей.</p>
+    </div>
+
+    <h2>⏱ Дрожжи и время подъёма (на 400 г муки)</h2>
+    <div class="tile">
+      <div class="yrow"><b>4–5 г · 1½ ч. л.</b><div class="bar2 wheat"><i style="width:12%"></i></div><span>1–1,5 ч в тепле</span></div>
+      <div class="yrow"><b>2 г · ⅔ ч. л.</b><div class="bar2 wheat"><i style="width:25%"></i></div><span>2,5–3 ч</span></div>
+      <div class="yrow"><b>1 г · ¼–⅓ ч. л.</b><div class="bar2 wheat"><i style="width:100%"></i></div><span>10–12 ч, 20–23 °C</span></div>
+      <p>Меньше дрожжей → дольше подъём → вкуснее хлеб. Перебродило, если ямка от пальца не выправляется совсем.</p>
+    </div>
+
+    <h2>🧫 Виды дрожжей</h2>
+    <div class="grid3">
+      <div class="tile"><div class="big">Сухие активные</div><p>Крупные гранулы. Развести в воде 35–38 °C (тёпленькая) с сахаром, 10 мин до пены. Нет пены — дрожжи мёртвые.</p></div>
+      <div class="tile"><div class="big">Быстродействующие</div><p>Мелкие «вермишелинки». Можно прямо в муку. Примерно на четверть сильнее — по тем же граммам почти без разницы.</p></div>
+      <div class="tile"><div class="big">Прессованные</div><p>Свежие брикеты. Брать втрое больше по весу, чем сухих.</p></div>
+    </div>
+    <p class="note">Важно количество, а не вид. Открытую пачку — закрытой в холодильник.</p>
+
+    <h2>🔥 Передержал или недопёк</h2>
+    <div class="grid3">
+      <div class="tile good"><div class="big">✅ +10 минут</div><p>Корка толще и темнее, мякиш чуть суше. Не страшно.</p></div>
+      <div class="tile bad"><div class="big">❌ Недопёк</div><p>Центр липкий и сырой. Это хуже — лучше передержать.</p></div>
+      <div class="tile"><div class="big">🛡 Верх темнеет</div><p>Фольга сверху, края подоткнуть — иначе вентилятор сдует.</p></div>
+    </div>
+
+    <h2>🌀 Аэрогриль</h2>
+    <div class="grid3">
+      <div class="tile"><div class="big">📄 Пергамент</div><p>С бортиками прямо в чашу. Расстойка — тоже в чаше.</p></div>
+      <div class="tile"><div class="big">⚖ ≤ 400 г муки</div><p>Больше — низ останется сырым.</p></div>
+      <div class="tile"><div class="big">🌡 Не 220 °C</div><p>Вентилятор близко: верх сгорит, середина сырая. 150–165 °C.</p></div>
+      <div class="tile"><div class="big">⏱ 25–30 мин</div><p>При 160 °C белая буханка пропекается сама, без переворота: ~280 г муки — 25 мин, 390 г — 30 мин.</p></div>
+    </div>
+
+    <h2>📝 Твой старый рецепт: что было не так</h2>
+    <div class="grid3">
+      <div class="tile"><p>💧 Вода от муки</p><div class="big"><span class="was">75%</span>64%</div><p>250 г воды → 390 г муки, а не 333</p></div>
+      <div class="tile"><p>🧫 Дрожжи</p><div class="big"><span class="was">3%</span>1,2%</div><p>10 г → 4,5 г; лишние перебраживают тесто за 2 ч</p></div>
+      <div class="tile"><p>🧂 Соль</p><div class="big"><span class="was">1,4%</span>2%</div><p>8 г на 400 г муки; от недосола хлеб пресный</p></div>
+      <div class="tile"><p>🥛 Мерный стакан</p><div class="big">325 мл ≈ 180 г</div><p>Граммы муки — по шкале «мука» или весами</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Плотность для перевода г -> мл (насыпью, без утрамбовки)
+const DENS = {water:1, flaxw:1,flour:0.55, whole:0.55, rye:0.6, oil:0.92, seeds:0.55, flax:0.65, raisin:0.65};
+// Граммов в 1 ч. л. (без горки) для мелочей
+const TSP = {yeast:3.2, salt:7, sugar:5, honey:7, vinegar:5, oil:4.5, malt:3, cori:2, butter:5};
+
+const R = [
+ {grp:'Можно сейчас — без ржаной муки', id:'r1', name:'Белый', tags:['пшеничный','~3 ч','now'],
+  why:'Твой рецепт с поправками: воды 64% от муки вместо 75%, дрожжей втрое меньше, соли вдвое больше. Тесто выходит лёгким и липким — так и должно быть. Простой белый хлеб к любой еде.',
+  ing:[['Вода 35–38 °C (тёпленькая: тепло заметно, но слабо)',250,'water'],['Мука общего назначения',390,'flour'],['Дрожжи сухие',4.5,null,'yeast'],['Соль',9,null,'salt'],['Сахар',8,null,'sugar']],
+  steps:['Дрожжи и сахар развести в воде 35–38 °C (тёпленькая), 10 минут до пены.','Соль смешать с мукой, влить воду и собрать тесто. Накрыть и оставить на 10–15 минут.','Месить 8–10 минут. Тесто должно остаться лёгким и липким — так и надо: от лишней муки хлеб плотный. Подсыпать по 1 ст. л. — только если тесто течёт.','По желанию — изюм или семена в конце замеса.','Подъём под крышкой в тепле 1–1,5 ч, до увеличения вдвое.','Обмять: выпустить газ, сложить 3–4 раза, скатать шар швом вниз. Заново не месить.','Шар — в чашу на пергамент, накрыть, расстойка 30–40 минут.','Надрезать верх ножом и печь.'],
+  bake:{t:'160 °C',time:'30 мин, без переворота — низ и так пропекается',ready:'93–96 °C',cool:'1 ч'}},
+ {grp:'Можно сейчас — без ржаной муки', id:'r1x', name:'Сладкий быстрый, можно в морозилку', tags:['пшеничный','~1,5 ч','now'],
+  why:'Один подход к тесту: замесил, скатал шар — и сразу в чашу, без обминки. На воде, только с сахаром — сладкий, как булка. Половину теста можно заморозить и испечь утром.',
+  ing:[['Вода 35–38 °C (тёпленькая: тепло заметно, но слабо)',250,'water'],['Мука общего назначения',390,'flour'],['Сахар',35,null,'sugar'],['Дрожжи сухие',7,null,'yeast'],['Соль',6,null,'salt']],
+  steps:['Дрожжи и 1 ч. л. сахара — в тёпленькую воду. Пока пенятся (5–10 мин): смешать муку с солью и остальным сахаром.','Всё соединить и сразу месить 8–10 минут. Тесто лёгкое и липкое — так и надо.','Скатать шар. С заморозкой — разделить пополам и скатать два шара.','Шар — в чашу на пергамент, накрыть, в тепло на 1–1,5 ч, до увеличения вдвое. Обминки нет.','Сбрызнуть верх водой и печь.','❄ Второй шар — сразу, не давая подняться: на кусок пергамента, в пакет, выпустить воздух — в морозилку. Хранится до месяца.','❄→🍞 Вечером накануне — из морозилки в холодильник, в пакете, на 10–12 ч: тесто оттает и начнёт подниматься.','Утром — с пергаментом в чашу, 30–60 минут в тепле, пока не вырастет в 1,5–2 раза. Через 30 минут ещё маленькое — подожди до часа. Печь.'],
+  bake:{t:'150 °C',time:'30 мин, без переворота; половина — 20–22 мин',ready:'92–95 °C',cool:'1 ч'},
+  modes:[
+   {n:'Лепёшка', flour:390, why:'Режим «Лепёшка»: тесто жидкое и в чаше расплывается — выходит плоская сладкая булка, её можно разорвать и положить что-нибудь внутрь.',
+    knead:'Всё соединить и перемешать 3–5 минут до гладкости. Тесто жидкое и липкое — муку не добавлять, так и задумано: в чаше оно расплывётся.',
+    bake:{t:'140 °C',time:'20 мин, без переворота; ~550 г муки (140%) — 25 мин',ready:'92–95 °C',cool:'30 мин'}},
+   {n:'Булка', flour:425, why:'Режим «Булка»: муки чуть больше — держит форму, мягкая и пышная.',
+    knead:'Всё соединить и сразу месить 8–10 минут. Тесто мягкое и липкое — так и надо.',
+    bake:{t:'150 °C',time:'30 мин, без переворота; половина — 20–22 мин',ready:'92–95 °C',cool:'1 ч'}},
+   {n:'Плотный', flour:455, why:'Режим «Плотный»: как ты делал раньше — хорошо вымешанное тесто, не липнет, хлеб плотный.',
+    knead:'Всё соединить и месить 10 минут, пока тесто не перестанет липнуть к рукам. Тесто плотное и упругое.',
+    bake:{t:'150 °C',time:'30–32 мин, без переворота; половина — 22 мин',ready:'93–96 °C',cool:'1 ч'}}]},
+ {grp:'Можно сейчас — без ржаной муки', id:'r2', name:'Белый ночной', tags:['пшеничный','10–12 ч','now'],
+  why:'Тот же хлеб, но дрожжей щепотка, а подъём идёт всю ночь. Вкус глубже, корка лучше, работы столько же. Лучший вкус на одних сухих дрожжах.',
+  ing:[['Вода 20–25 °C (комнатная: ни тепла, ни холода)',260,'water'],['Мука общего назначения',400,'flour'],['Дрожжи сухие',1,null,'yeast'],['Соль',8,null,'salt'],['Сахар',5,null,'sugar']],
+  steps:['Вечером: дрожжи развести в воде, соль смешать с мукой, соединить. Отдых 15 минут.','Месить 8 минут, плотно накрыть и оставить при 20–23 °C на 10–12 ч.','Если дома жарче 25 °C — час на столе, потом в холодильник, утром час согревать.','Утром: обмять, скатать шар, положить в чашу на пергамент.','Расстойка 1–1,5 ч (холодное тесто встаёт дольше).','Надрезать и печь.'],
+  bake:{t:'160 °C',time:'30 мин, без переворота — низ и так пропекается',ready:'93–96 °C',cool:'1 ч'}},
+ {grp:'Можно сейчас — без ржаной муки', id:'r3', name:'С цельнозерновой и семенами', tags:['пшеничный','~3 ч','now'],
+  why:'Плотнее и ароматнее белого, с ореховым вкусом, дольше не черствеет. Цельнозерновая мука пьёт больше воды.',
+  ing:[['Вода 35–38 °C (тёпленькая: тепло заметно, но слабо)',280,'water'],['Мука общего назначения',250,'flour'],['Мука цельнозерновая',150,'whole'],['Лён (замочить)',20,'flax'],['Вода для льна',40,'flaxw'],['Семечки подсолнечника',60,'seeds'],['Дрожжи сухие',4.5,null,'yeast'],['Соль',8,null,'salt'],['Сахар',10,null,'sugar']],
+  steps:['Лён залить водой на 20 минут. Дрожжи с сахаром развести в тёплой воде.','Смешать муку с солью, влить воду и собрать тесто. Отдых 20 минут: цельнозерновая мука набухает дольше.','Месить 8–10 минут, в конце добавить лён и семечки (горсть оставить на верх).','Подъём 1–1,5 ч, обмять, скатать шар, в чашу на пергамент.','Сбрызнуть водой, посыпать семечками, расстойка 40 минут.','Печь.'],
+  bake:{t:'160 °C',time:'35 мин + 8 мин дном вверх',ready:'94–96 °C',cool:'1–2 ч'}},
+ {grp:'Когда купишь ржаную муку', id:'r4', name:'Серый, 25% ржи', tags:['мягкий','~3 ч','need'],
+  why:'Похож на магазинный серый: лёгкий, хорошо поднимается, кислинки почти нет. Самый простой переход к ржаному.',
+  ing:[['Вода 35–38 °C (тёпленькая: тепло заметно, но слабо)',270,'water'],['Мука общего назначения',300,'flour'],['Мука ржаная',100,'rye'],['Дрожжи сухие',4.5,null,'yeast'],['Соль',8,null,'salt'],['Сахар',8,null,'sugar'],['Масло растительное',15,null,'oil']],
+  steps:['Дрожжи с сахаром — в тёплую воду, 10 минут.','Смешать муку с солью, влить воду и масло, собрать тесто. Отдых 10 минут.','Месить 8 минут. Тесто липче белого — не забивать мукой.','Подъём 1 ч, обмять, скатать шар, в чашу на пергамент.','Расстойка 40 минут, надрезать, печь.'],
+  bake:{t:'160 °C',time:'32 мин + 8 мин дном вверх',ready:'94–96 °C',cool:'1–2 ч'}},
+ {grp:'Когда купишь ржаную муку', id:'r5', name:'Ночной 50/50 с семечками', tags:['ржаной наполовину','10–12 ч','need'],
+  why:'Ржаная опара бродит всю ночь на щепотке дрожжей и даёт кисловатый ржаной аромат — без кефира и закваски.',
+  ing:[{h:'Вечером — опара'},['Мука ржаная',200,'rye'],['Вода 35–38 °C (тёпленькая: тепло заметно, но слабо)',200,'water'],['Дрожжи сухие',1,null,'yeast'],
+       {h:'Утром — тесто'},['Мука общего назначения',200,'flour'],['Вода 20–25 °C (комнатная)',120,'water'],['Семечки подсолнечника',60,'seeds'],['Соль',8,null,'salt'],['Сахар',10,null,'sugar']],
+  steps:['Вечером: дрожжи развести в воде, размешать с ржаной мукой ложкой, накрыть. 10–12 ч при комнатной температуре: опара пузырится и кисловато пахнет.','Утром: добавить всё остальное и мешать ложкой или мокрыми руками 3–5 минут. Ржаное тесто долго не месят.','Подъём 1–1,5 ч.','Мокрыми руками переложить в чашу на пергамент и разгладить верх.','Расстойка 40–60 минут, пока не пойдут трещинки. Печь.'],
+  bake:{t:'160 °C',time:'40 мин + 10 мин дном вверх',ready:'96–98 °C',cool:'6 ч'}},
+ {grp:'Когда купишь ржаную муку', id:'r6', name:'«Дарницкий» быстрый, 60% ржи', tags:['классика под первое','~3,5 ч','need'],
+  why:'Тёмно-серый хлеб под борщ. Кислинку вместо кефира даёт ложка уксуса: без кислоты ржаной мякиш липкий. Вкуса уксуса после печи не слышно.',
+  ing:[['Вода 35–38 °C (тёпленькая: тепло заметно, но слабо)',320,'water'],['Мука ржаная',240,'rye'],['Мука общего назначения',160,'flour'],['Дрожжи сухие',5,null,'yeast'],['Соль',8,null,'salt'],['Сахар',15,null,'sugar'],['Уксус 9%',15,null,'vinegar'],['Масло растительное',10,null,'oil']],
+  steps:['Дрожжи с сахаром — в тёплую воду, 10 минут.','Всё смешать ложкой до однородной липкой массы. Не месить.','Подъём 1 ч, перемешать ложкой.','Мокрыми руками в чашу на пергамент, разгладить верх.','Расстойка 40–50 минут до трещинок. Печь.'],
+  bake:{t:'155 °C',time:'45 мин + 10 мин дном вверх',ready:'96–98 °C',cool:'6–8 ч'}},
+ {grp:'Когда купишь ржаную муку', id:'r7', name:'Заварной с солодом и изюмом, 80% ржи', tags:['самый ржаной','~4 ч','need'],
+  why:'Тёмный, кисло-сладкий, с кориандром — бородинского типа. Нужен красный ферментированный ржаной солод (продаётся в пачках).',
+  ing:[{h:'Заварка'},['Мука ржаная',60,'rye'],['Солод ржаной',20,null,'malt'],['Кориандр молотый',2,null,'cori'],['Кипяток',180,'water'],
+       {h:'Тесто'},['Мука ржаная',200,'rye'],['Мука общего назначения',80,'flour'],['Вода 35–38 °C (тёпленькая: тепло заметно, но слабо)',100,'water'],['Изюм (замочить)',60,'raisin'],['Дрожжи сухие',5,null,'yeast'],['Соль',8,null,'salt'],['Мёд',25,null,'honey'],['Уксус 9%',15,null,'vinegar']],
+  steps:['Заварку размешать и оставить на 2 ч, пока не остынет.','Дрожжи развести в тёплой воде, изюм замочить на 10 минут и обсушить.','Всё соединить с заваркой и перемешать ложкой. Подъём 1 ч.','Мокрыми руками в чашу на пергамент, посыпать целым кориандром.','Расстойка 40–60 минут. Печь.'],
+  bake:{t:'150 °C',time:'50 мин + 10 мин дном вверх',ready:'96–98 °C',cool:'8 ч'}},
+];
+
+const S = Object.assign({main:'g', small:'sp', vol:{}, mode:{}}, JSON.parse(localStorage.getItem('bread-units')||'{}'));
+delete S.k; delete S.v;
+const META = {
+  r1:{rye:0, short:'Простой белый к любой еде'},
+  r1x:{rye:0, short:'Как булка; один подход; половину — в морозилку'},
+  r2:{rye:0, short:'Лучший вкус на одних дрожжах, работы столько же'},
+  r3:{rye:0, short:'Плотнее, ореховый, долго не черствеет'},
+  r4:{rye:25, short:'Как магазинный серый, мягкий'},
+  r5:{rye:50, short:'Ржаной аромат без закваски — за счёт ночи'},
+  r6:{rye:60, short:'Классика под борщ'},
+  r7:{rye:80, short:'Тёмный, кисло-сладкий, нужен солод'},
+};
+const FR = [[0,''],[0.25,'¼'],[1/3,'⅓'],[0.5,'½'],[2/3,'⅔'],[0.75,'¾'],[1,'']];
+function frac(x){
+  let w=Math.floor(x), r=x-w, best=FR[0];
+  for(const f of FR) if(Math.abs(f[0]-r)<Math.abs(best[0]-r)) best=f;
+  if(best[0]===1){w+=1;best=FR[0];}
+  return (w? w+(best[1]?' ':''):'') + best[1];
+}
+function spoon(tsp){
+  if(tsp<0.18) return 'щепотка';
+  if(tsp>=3) return frac(tsp/3)+' ст. л.';
+  return frac(tsp)+' ч. л.';
+}
+const num = g => g<10 ? (Math.round(g*2)/2).toString().replace('.',',') : Math.round(g);
+const step = g => g>=100 ? 10 : 5;
+const roundTo = (x,s) => Math.max(s, Math.round(x/s)*s);
+// Доли ложки, которые легко отмерить: четверти и трети
+function spoonErr(tsp){
+  const u = tsp>=3 ? tsp/3 : tsp;
+  if(u<0.18) return 0;
+  const near = Math.min(Math.abs(u-Math.round(u*4)/4), Math.abs(u-Math.round(u*3)/3));
+  return near/u;
+}
+// Для каждого рецепта — 4 объёма около 25/50/75/100%, при которых граммы и ложки выходят круглыми
+function stops(r){
+  const ing=r.ing.filter(it=>!it.h);
+  const pick = t=>{
+    const d = t>100 ? 10 : 5;
+    let best=t, bestE=Infinity;
+    for(let p=t-d;p<=t+d;p++){
+      const k=p/100;
+      let e=0;
+      for(const it of ing){
+        const g=it[1]*k;
+        if(it[3]) e+=spoonErr(g/TSP[it[3]]);
+        else { const s=step(g); e+=Math.abs(g-Math.round(g/s)*s)/g; }
+      }
+      e+=Math.abs(p-t)*0.004; // при равенстве — ближе к круглому проценту
+      if(e<bestE){bestE=e;best=p;}
+    }
+    return best;
+  };
+  return [pick(25),pick(50),pick(75),100,pick(150),pick(200)];
+}
+// Режим рецепта (если есть) подменяет муку, шаг замеса и выпечку
+function modeOf(r,mi){
+  const m=r.modes[mi];
+  return {...r, ing:r.ing.map(it=> !it.h && it[2]==='flour' ? [it[0],m.flour,it[2]] : it),
+    steps:r.steps.map((st,i)=> i===1 ? m.knead : st), bake:m.bake, why:r.why+' '+m.why, mode:m.n};
+}
+R.forEach(r=>{ r.stops=stops(r); if(r.modes) r.modes.forEach((m,mi)=>m.stops=stops(modeOf(r,mi))); });
+const eff = r => { if(!r.modes) return r; const mi=S.mode[r.id] ?? 1; return {...modeOf(r,mi), stops:r.modes[mi].stops}; };
+const pct = r => r.stops[S.vol[r.id] ?? 3];
+function qty(it,k){
+  const raw=it[1]*k/100;
+  const g = it[3] || k===100 ? raw : roundTo(raw, step(raw));
+  if(it[3]){ // мелочь
+    const tsp=g/TSP[it[3]];
+    if(S.small==='sp') return spoon(tsp);
+    if(S.small==='ml') return num(tsp*5)+' мл';
+    return num(g)+' г';
+  }
+  if(S.main==='ml'){
+    const v=g/DENS[it[2]], ml=roundTo(v, v>=100?10:5);
+    const hint = DENS[it[2]]===1 ? '' : '<span class="hint">насыпью, не утрамбовывать</span>';
+    return ml+' мл'+hint;
+  }
+  return Math.round(g)+' г';
+}
+function hyd(r){
+  let w=0,f=0;
+  for(const it of r.ing){ if(it.h||it[3]) continue;
+    if(it[2]==='water') w+=it[1];
+    if(['flour','whole','rye'].includes(it[2])) f+=it[1]; }
+  return Math.round(w/f*100);
+}
+const flourG=(r,k)=>r.ing.filter(it=>!it.h&&!it[3]&&['flour','whole','rye'].includes(it[2])).reduce((a,it)=>a+it[1],0)*k/100;
+function card(r){
+  const k=pct(r);
+  const ing=r.ing.map(it=> it.h?`<tr class="h"><td colspan="2">${it.h}</td></tr>`:`<tr><td>${it[0]}</td><td class="q">${qty(it,k)}</td></tr>`).join('');
+  const b=r.bake;
+  return `<h3>${r.name}${r.mode?' · '+r.mode:''} · ${k}%</h3><p class="why">${r.why}</p>
+    <div class="cols"><table class="ing">${ing}</table><ol>${r.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div>
+    <div class="bake"><div><b>Аэрогриль</b>${b.t}</div><div><b>Время</b>${b.time}</div><div><b>Готов в центре</b>${b.ready}</div><div><b>Резать через</b>${b.cool}</div></div>
+    ${k<=60?'<p class="note">Объём меньше — пеки на 8–10 минут меньше.</p>':k<100?'<p class="note">Объём меньше — пеки на 3–5 минут меньше.</p>':''}
+    ${flourG(r,k)>450?`<p class="note">Муки ${Math.round(flourG(r,k)/10)*10} г — в одну буханку не влезет: дели тесто на части по 300–400 г муки и пеки по очереди.</p>`:''}`;
+}
+const rows=document.getElementById('rows'), pop=document.getElementById('pop'), tbl=document.querySelector('table.rec');
+let popI=null, hideT;
+function render(){
+  let h='', grp='';
+  R.forEach((r,i)=>{
+    if(r.grp!==grp){ grp=r.grp; h+=`<tr class="g"><td colspan="7">${grp}</td></tr>`; }
+    const m=META[r.id], o=r; r=eff(o);
+    const ms = o.modes ? `<div class="mseg" data-id="${o.id}">${o.modes.map((x,mi)=>`<button data-m="${mi}" class="${(S.mode[o.id] ?? 1)===mi?'on':''}">${x.n}</button>`).join('')}</div>` : '';
+    h+=`<tr class="r" data-i="${i}"><td class="rname">${r.name}${ms}</td>
+      <td><div class="vol"><input type="range" min="0" max="5" step="1" value="${S.vol[r.id] ?? 3}" data-id="${r.id}"><output>${pct(r)}%</output></div></td>
+      <td>${m.rye}%<div class="meter"><i style="width:${m.rye}%"></i></div></td>
+      <td>${r.tags[1]}</td><td>${hyd(r)}%</td>
+      <td>${r.bake.t} · ${r.bake.time.split(',')[0].replace(' дном вверх','')}</td><td>${m.short}</td></tr>`;
+  });
+  rows.innerHTML=h;
+  document.querySelectorAll('.seg').forEach(s=>s.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===S[s.dataset.k])));
+  if(popI!==null) pop.innerHTML=card(eff(R[popI]));
+  localStorage.setItem('bread-units',JSON.stringify(S));
+}
+function hide(){ pop.classList.remove('on'); popI=null; }
+rows.addEventListener('mouseover',e=>{
+  const tr=e.target.closest('tr.r'); if(!tr) return;
+  clearTimeout(hideT);
+  const i=+tr.dataset.i;
+  if(popI!==i){ popI=i; pop.innerHTML=card(eff(R[i])); }
+  pop.style.top=(tbl.offsetTop+tr.offsetTop+tr.offsetHeight)+'px';
+  pop.classList.add('on');
+});
+rows.addEventListener('mouseleave',()=>{ hideT=setTimeout(hide,300); });
+pop.addEventListener('mouseenter',()=>clearTimeout(hideT));
+pop.addEventListener('mouseleave',()=>{ hideT=setTimeout(hide,300); });
+document.querySelectorAll('.seg').forEach(s=>s.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return; S[s.dataset.k]=b.dataset.v; render();
+}));
+// Переключатель режима в строке
+rows.addEventListener('click',e=>{
+  const b=e.target.closest('.mseg button'); if(!b) return;
+  const id=b.parentElement.dataset.id;
+  S.mode[id]=+b.dataset.m; popI=R.findIndex(r=>r.id===id); render();
+});
+// Ползунок в строке: строки не перерисовываем, чтобы не сбить перетаскивание
+rows.addEventListener('input',e=>{
+  const id=e.target.dataset.id; if(!id) return;
+  const i=R.findIndex(r=>r.id===id);
+  S.vol[id]=+e.target.value;
+  e.target.nextElementSibling.textContent=pct(eff(R[i]))+'%';
+  popI=i; pop.innerHTML=card(eff(R[i]));
+  localStorage.setItem('bread-units',JSON.stringify(S));
+});
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p));
+}));
+render();
+</script>
+</body>
+</html>
