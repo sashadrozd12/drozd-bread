@@ -25,9 +25,6 @@
   .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
   .seg button{border:0;background:none;color:var(--ink);padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
   .seg button.on{background:var(--accent);color:#fff}
-  .mseg{display:flex;margin-top:6px;border:1px solid var(--line);border-radius:999px;overflow:hidden;width:max-content;font-weight:400}
-  .mseg button{border:0;background:var(--card);color:var(--ink);padding:3px 9px;font:inherit;font-size:12px;cursor:pointer}
-  .mseg button.on{background:var(--accent);color:#fff}
   nav{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
   nav a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);
         border-radius:999px;padding:4px 10px}
@@ -113,6 +110,8 @@
         <div class="seg" data-k="main"><button data-v="g">граммы</button><button data-v="ml">миллилитры</button></div></div>
       <div class="grp"><span>Мелочи</span>
         <div class="seg" data-k="small"><button data-v="sp">ложки</button><button data-v="g">граммы</button><button data-v="ml">мл</button></div></div>
+      <div class="grp"><span>Тесто</span>
+        <div class="seg" data-k="dens"><button data-v="0">Лепёшка</button><button data-v="1">Обычное</button><button data-v="2">Плотное</button></div></div>
     </div>
     <div class="tw">
       <table class="rec">
@@ -286,7 +285,7 @@ const R = [
   bake:{t:'150 °C',time:'50 мин + 10 мин дном вверх',ready:'96–98 °C',cool:'8 ч'}},
 ];
 
-const S = Object.assign({main:'g', small:'sp', vol:{}, mode:{}}, JSON.parse(localStorage.getItem('bread-units')||'{}'));
+const S = Object.assign({main:'g', small:'sp', vol:{}, dens:'1'}, JSON.parse(localStorage.getItem('bread-units')||'{}'));
 delete S.k; delete S.v;
 const META = {
   r1:{rye:0, short:'Простой белый к любой еде'},
@@ -342,13 +341,21 @@ function stops(r){
   return [pick(25),pick(50),pick(75),100,pick(150),pick(200)];
 }
 // Режим рецепта (если есть) подменяет муку, шаг замеса и выпечку
+const FL=['flour','whole','rye'];
 function modeOf(r,mi){
   const m=r.modes[mi];
-  return {...r, ing:r.ing.map(it=> !it.h && it[2]==='flour' ? [it[0],m.flour,it[2]] : it),
-    steps:r.steps.map((st,i)=> i===1 ? m.knead : st), bake:m.bake, why:r.why+' '+m.why, mode:m.n};
+  return {...r, ing:r.ing.map(it=> it.h || !FL.includes(it[2]) ? it : [it[0], m.flour ?? Math.round(it[1]*m.k/5)*5, it[2]]),
+    steps: m.knead ? r.steps.map((st,i)=> i===1 ? m.knead : st) : r.steps,
+    bake: m.bake || r.bake, why: m.why ? r.why+' '+m.why : r.why, mode:m.n};
 }
+// Три режима плотности для рецептов без своих режимов: вся мука ×0,92 / ×1 / ×1,07
+const GEN=[
+  {n:'Лепёшка', k:0.92, why:'Режим «Лепёшка»: муки на 8% меньше — тесто жидкое, в чаше расплывается, выходит плоская мягкая лепёшка. Печётся на 3–5 минут быстрее.'},
+  {n:'Обычный', k:1},
+  {n:'Плотный', k:1.07, why:'Режим «Плотный»: муки на 7% больше — тесто вымешивается до «не липнет», хлеб плотнее.'}];
+R.forEach(r=>{ if(!r.modes) r.modes=GEN.map(m=>({...m})); });
 R.forEach(r=>{ r.stops=stops(r); if(r.modes) r.modes.forEach((m,mi)=>m.stops=stops(modeOf(r,mi))); });
-const eff = r => { if(!r.modes) return r; const mi=S.mode[r.id] ?? 1; return {...modeOf(r,mi), stops:r.modes[mi].stops}; };
+const eff = r => { if(!r.modes) return r; const mi=+S.dens; return {...modeOf(r,mi), stops:r.modes[mi].stops}; };
 const pct = r => r.stops[S.vol[r.id] ?? 3];
 function qty(it,k){
   const raw=it[1]*k/100;
@@ -391,8 +398,7 @@ function render(){
   R.forEach((r,i)=>{
     if(r.grp!==grp){ grp=r.grp; h+=`<tr class="g"><td colspan="7">${grp}</td></tr>`; }
     const m=META[r.id], o=r; r=eff(o);
-    const ms = o.modes ? `<div class="mseg" data-id="${o.id}">${o.modes.map((x,mi)=>`<button data-m="${mi}" class="${(S.mode[o.id] ?? 1)===mi?'on':''}">${x.n}</button>`).join('')}</div>` : '';
-    h+=`<tr class="r" data-i="${i}"><td class="rname">${r.name}${ms}</td>
+    h+=`<tr class="r" data-i="${i}"><td class="rname">${r.name}</td>
       <td><div class="vol"><input type="range" min="0" max="5" step="1" value="${S.vol[r.id] ?? 3}" data-id="${r.id}"><output>${pct(r)}%</output></div></td>
       <td>${m.rye}%<div class="meter"><i style="width:${m.rye}%"></i></div></td>
       <td>${r.tags[1]}</td><td>${hyd(r)}%</td>
@@ -418,12 +424,6 @@ pop.addEventListener('mouseleave',()=>{ hideT=setTimeout(hide,300); });
 document.querySelectorAll('.seg').forEach(s=>s.addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return; S[s.dataset.k]=b.dataset.v; render();
 }));
-// Переключатель режима в строке
-rows.addEventListener('click',e=>{
-  const b=e.target.closest('.mseg button'); if(!b) return;
-  const id=b.parentElement.dataset.id;
-  S.mode[id]=+b.dataset.m; popI=R.findIndex(r=>r.id===id); render();
-});
 // Ползунок в строке: строки не перерисовываем, чтобы не сбить перетаскивание
 rows.addEventListener('input',e=>{
   const id=e.target.dataset.id; if(!id) return;
